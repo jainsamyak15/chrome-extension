@@ -22,6 +22,7 @@ CORS(app, resources={
 # Initialize chat handler
 chat_handler = ChatHandler(Config.TOGETHER_API_KEY, Config.MODEL_NAME)
 
+
 @app.route('/api/chat', methods=['POST', 'OPTIONS'])
 def chat():
     if request.method == 'OPTIONS':
@@ -59,6 +60,31 @@ def chat():
     except Exception as e:
         logger.error(f"Error in chat endpoint: {str(e)}", exc_info=True)
         return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/analyze', methods=['POST'])
+def analyze():
+    try:
+        data = request.json
+        if not data:
+            return jsonify({"error": "No data provided"}), 400
+
+        content = data.get('content', '')
+        if not content:
+            return jsonify({"error": "No content provided"}), 400
+
+        # Process content
+        processed_content = chat_handler.prepare_content(content, '')
+
+        # Perform analysis
+        analysis = chat_handler.analyze_content(processed_content)
+
+        return jsonify(analysis)
+
+    except Exception as e:
+        logger.error(f"Error in analyze endpoint: {str(e)}", exc_info=True)
+        return jsonify({"error": str(e)}), 500
+
 
 if __name__ == '__main__':
     app.run(debug=True, port=3000, host='0.0.0.0')
