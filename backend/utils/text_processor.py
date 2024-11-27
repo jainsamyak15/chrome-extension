@@ -1,45 +1,30 @@
-from bs4 import BeautifulSoup
-import requests
+import logging
+
+logger = logging.getLogger(__name__)
 
 
-def scrape_website(url):
-    """
-    Scrape website content using BeautifulSoup
-    """
-    try:
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-        }
-        response = requests.get(url, headers=headers, timeout=10)
-        response.raise_for_status()
+class TextProcessor:
+    def __init__(self, max_length=10000):
+        self.max_length = max_length
 
-        soup = BeautifulSoup(response.text, 'lxml')
+    def process(self, content):
+        """
+        Process and clean text content
+        """
+        try:
+            # Remove excess whitespace and newlines
+            content = ' '.join(content.split())
 
-        # Remove unwanted elements
-        for element in soup(['script', 'style', 'header', 'footer', 'nav']):
-            element.decompose()
+            # Remove multiple spaces
+            while '  ' in content:
+                content = content.replace('  ', ' ')
 
-        # Extract text content
-        text = soup.get_text(separator=' ', strip=True)
-        return process_website_content(text)
-    except Exception as e:
-        return f"Error scraping website: {str(e)}"
+            # Limit content length
+            if len(content) > self.max_length:
+                content = content[:self.max_length] + "..."
 
+            return content
 
-def process_website_content(content):
-    """
-    Process and clean website content for better context understanding
-    """
-    # Remove excess whitespace and newlines
-    content = ' '.join(content.split())
-
-    # Remove multiple spaces
-    while '  ' in content:
-        content = content.replace('  ', ' ')
-
-    # Limit content length to prevent token overflow
-    max_length = 10000
-    if len(content) > max_length:
-        content = content[:max_length] + "..."
-
-    return content
+        except Exception as e:
+            logger.error(f"Error processing text: {str(e)}")
+            return f"Error processing text: {str(e)}"
