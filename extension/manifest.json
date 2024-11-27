@@ -1,6 +1,6 @@
 {
     "manifest_version": 3,
-    "name": "Website Chat Assistant",
+    "name": "AI Website Assistant",
     "version": "1.0",
     "description": "Chat with website content using AI",
     "permissions": [
@@ -9,7 +9,9 @@
         "tabs"
     ],
     "host_permissions": [
-        "http://localhost:5000/*"
+        "http://localhost:3000/*",
+        "https://*/*",
+        "http://*/*"
     ],
     "action": {
         "default_popup": "popup.html",
@@ -23,8 +25,8 @@
             "js": ["content.js"]
         }
     ],
-
-     "background": {
-         "service_worker": "background.js"
-     }
+    "background": {
+        "service_worker": "background.js",
+        "type": "module"
+    }
 }
