@@ -68,6 +68,26 @@ body {
   animation: fadeIn 0.3s ease-in-out;
 }
 
+.analysis {
+  max-width: 100%;
+  background-color: #f8fafc;
+  border: 1px solid var(--border-color);
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.analysis-content {
+  font-size: 0.85rem;
+}
+
+.analysis-content p {
+  margin: 0.5rem 0;
+}
+
+.analysis-content strong {
+  color: var(--primary-color);
+}
+
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
@@ -147,6 +167,29 @@ body {
 
 .offline i {
   color: #ef4444;
+}
+
+.typing-indicator {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.typing-indicator span {
+  animation: typing 1s infinite;
+  font-size: 1.2rem;
+}
+
+.typing-indicator span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-indicator span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes typing {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
 }
 
 /* Scrollbar Styling */

@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentUrl = '';
 
     function updateConnectionStatus(isOnline) {
-        statusIndicator.className = isOnline ? 'online' : 'offline';
+        statusIndicator.className = isOnline ? 'status-indicator online' : 'status-indicator offline';
         statusIndicator.innerHTML = `<i class="fas fa-circle"></i> ${isOnline ? 'Connected' : 'Offline'}`;
     }
 
@@ -64,12 +64,66 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    async function analyzeContent(content) {
+        try {
+            const response = await fetch('http://localhost:3000/api/analyze', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ content })
+            });
+
+            if (!response.ok) {
+                throw new Error(`Analysis failed: ${response.status}`);
+            }
+
+            const analysis = await response.json();
+            return analysis;
+        } catch (error) {
+            console.error('Analysis error:', error);
+            return null;
+        }
+    }
+
+    function displayAnalysis(analysis) {
+        if (!analysis) return;
+
+        const analysisDiv = document.createElement('div');
+        analysisDiv.className = 'message assistant-message analysis';
+
+        const summary = analysis.summary ? `<p><strong>Summary:</strong> ${analysis.summary}</p>` : '';
+        const sentiment = analysis.sentiment ?
+            `<p><strong>Sentiment:</strong> ${analysis.sentiment.sentiment} 
+             (Polarity: ${analysis.sentiment.polarity}, 
+             Subjectivity: ${analysis.sentiment.subjectivity})</p>` : '';
+        const keywords = analysis.keywords?.length ?
+            `<p><strong>Key Topics:</strong> ${analysis.keywords.join(', ')}</p>` : '';
+
+        analysisDiv.innerHTML = `
+            <div class="analysis-content">
+                ${summary}
+                ${sentiment}
+                ${keywords}
+            </div>
+        `;
+
+        chatMessages.appendChild(analysisDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
     async function initializeChat() {
         try {
             websiteContent = await getPageContent();
             console.log('Initialized with content length:', websiteContent.length);
             const isConnected = await checkServerConnection();
             updateConnectionStatus(isConnected);
+
+            // Analyze initial content
+            const analysis = await analyzeContent(websiteContent);
+            if (analysis) {
+                displayAnalysis(analysis);
+            }
 
             addMessage('Hello! I\'m ready to help you understand this webpage. What would you like to know?', false);
         } catch (error) {
